@@ -20,7 +20,7 @@ ast-find --lang js --query 'def(name=/^handle/)'
 ```
 
 **Features:**
-- ✅ JavaScript, TypeScript, Python support
+- ✅ JavaScript, TypeScript, Python, C# support
 - ✅ Deterministic NDJSON output
 - ✅ Parallel file processing with rayon
 - ✅ Git-aware file walking (.gitignore respected)
@@ -51,16 +51,20 @@ web-get "https://blog.example.com" --selector "article, .post-content"
 
 ## Installation
 
+Use the bundled installer to build both binaries in release mode and copy them
+to `/usr/local/bin` (pass `--prefix`/`--destdir` to customize the target):
+
+```bash
+git clone https://github.com/Chris-Cullins/agent-tools.git
+cd agent-tools
+./install.sh
+```
+
+Prefer to install each crate manually? You can still use `cargo install`:
+
 ```bash
 cargo install --path crates/ast-find
 cargo install --path crates/web-get
-```
-
-Or build both:
-
-```bash
-cargo build --release
-# Binaries in target/release/ast-find and target/release/web-get
 ```
 
 ## Quick Start

@@ -3,9 +3,9 @@ mod dsl;
 mod languages;
 mod processor;
 
+use agent_tools_common::{write_ndjson, Event};
 use anyhow::Result;
 use clap::Parser;
-use agent_tools_common::{Event, write_ndjson};
 use ignore::WalkBuilder;
 use languages::{get_adapter, parse_lang_list, LangId, LANG_BY_EXT};
 use rayon::prelude::*;
@@ -87,7 +87,12 @@ fn main() -> Result<()> {
                         return;
                     }
                     // Key by (path, start_line) for deterministic ordering
-                    if let Event::Match { ref path, start_line, .. } = event {
+                    if let Event::Match {
+                        ref path,
+                        start_line,
+                        ..
+                    } = event
+                    {
                         results.insert((path.clone(), start_line), event);
                     }
                 }

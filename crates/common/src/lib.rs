@@ -36,10 +36,7 @@ pub enum Event {
         path_or_url: Option<String>,
     },
     #[serde(rename = "summary")]
-    Summary {
-        tool: String,
-        message: String,
-    },
+    Summary { tool: String, message: String },
 }
 
 /// Write a single JSON object as a line (NDJSON). Flushes immediately.

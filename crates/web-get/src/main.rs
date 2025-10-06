@@ -2,9 +2,9 @@ mod convert;
 mod extract;
 mod fetch;
 
+use agent_tools_common::{write_ndjson, Event};
 use anyhow::Result;
 use clap::Parser;
-use agent_tools_common::{Event, write_ndjson};
 use futures::stream::{FuturesUnordered, StreamExt};
 use std::io::{self, BufRead};
 

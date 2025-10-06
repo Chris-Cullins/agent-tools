@@ -1,5 +1,4 @@
 /// HTTP fetching with size and timeout limits.
-
 use anyhow::Result;
 use bytes::Bytes;
 use reqwest::Client;

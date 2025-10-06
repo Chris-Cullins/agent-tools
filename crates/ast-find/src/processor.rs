@@ -1,5 +1,4 @@
 /// File processing logic for ast-find.
-
 use crate::adapter::{CaptureBundle, LangAdapter};
 use crate::dsl::{Expr, Pred};
 use agent_tools_common::{is_probably_binary, make_chunk_id, slice_with_context, Event, LineIndex};
@@ -72,7 +71,8 @@ pub fn process_file(
             let chunk_id = make_chunk_id(path, start_line, end_line);
 
             // Extract excerpt with context
-            let excerpt = slice_with_context(&src, &line_index, start_line, end_line, context_lines);
+            let excerpt =
+                slice_with_context(&src, &line_index, start_line, end_line, context_lines);
 
             // Build capture JSON
             let capture_json = serde_json::json!({
@@ -104,11 +104,17 @@ fn apply_predicates(preds: &[Pred], bundle: &CaptureBundle) -> bool {
     for pred in preds {
         let matched = match pred {
             Pred::Callee(re) => {
-                bundle.get("callee_id").map(|t| re.is_match(t)).unwrap_or(false)
+                bundle
+                    .get("callee_id")
+                    .map(|t| re.is_match(t))
+                    .unwrap_or(false)
                     || bundle.get("prop").map(|t| re.is_match(t)).unwrap_or(false)
             }
             Pred::Name(re) => bundle.get("name").map(|t| re.is_match(t)).unwrap_or(false),
-            Pred::Module(re) => bundle.get("module").map(|t| re.is_match(t)).unwrap_or(false),
+            Pred::Module(re) => bundle
+                .get("module")
+                .map(|t| re.is_match(t))
+                .unwrap_or(false),
             Pred::Prop(re) => bundle.get("prop").map(|t| re.is_match(t)).unwrap_or(false),
             Pred::Arg(_) => {
                 // TODO: Implement argument matching

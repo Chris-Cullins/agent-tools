@@ -1,5 +1,4 @@
 /// Language adapter trait for translating DSL queries into Tree-sitter queries.
-
 use crate::dsl::Expr;
 use anyhow::Result;
 use std::collections::HashMap;

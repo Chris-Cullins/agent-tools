@@ -1,7 +1,6 @@
-/// HTML content extraction (Readability-lite heuristic).
-
-use scraper::{Html, Selector};
 use anyhow::Result;
+/// HTML content extraction (Readability-lite heuristic).
+use scraper::{Html, Selector};
 
 pub struct ExtractOptions {
     pub selector: Option<String>,
@@ -14,7 +13,11 @@ pub struct ExtractedContent {
     pub main_html: String,
 }
 
-pub fn extract_content(html: &str, base_url: &str, opts: &ExtractOptions) -> Result<ExtractedContent> {
+pub fn extract_content(
+    html: &str,
+    base_url: &str,
+    opts: &ExtractOptions,
+) -> Result<ExtractedContent> {
     let document = Html::parse_document(html);
 
     // Extract metadata
@@ -106,8 +109,8 @@ fn extract_canonical(document: &Html, base_url: &str) -> Option<String> {
 }
 
 fn extract_by_selector(document: &Html, selector_str: &str) -> Result<String> {
-    let selector = Selector::parse(selector_str)
-        .map_err(|e| anyhow::anyhow!("Invalid selector: {:?}", e))?;
+    let selector =
+        Selector::parse(selector_str).map_err(|e| anyhow::anyhow!("Invalid selector: {:?}", e))?;
 
     // Find the first matching element with the most text
     let mut best_el = None;

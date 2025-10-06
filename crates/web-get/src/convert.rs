@@ -1,5 +1,4 @@
 /// HTML to Markdown conversion with sanitization.
-
 use ammonia::Builder;
 use anyhow::Result;
 use scraper::{Html, Selector};
@@ -96,10 +95,7 @@ fn extract_links(html: &str, base_url: &str) -> Vec<String> {
 }
 
 /// Decode bytes to UTF-8 with charset detection.
-pub fn decode_to_utf8(
-    bytes: &[u8],
-    header_charset: Option<&str>,
-) -> Result<String> {
+pub fn decode_to_utf8(bytes: &[u8], header_charset: Option<&str>) -> Result<String> {
     // Try header charset first
     if let Some(cs) = header_charset {
         if let Some(enc) = encoding_rs::Encoding::for_label(cs.trim().as_bytes()) {

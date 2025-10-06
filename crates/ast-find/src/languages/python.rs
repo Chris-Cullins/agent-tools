@@ -1,5 +1,4 @@
 /// Python language adapter.
-
 use crate::adapter::LangAdapter;
 use crate::dsl::{Expr, Kind};
 use anyhow::Result;
