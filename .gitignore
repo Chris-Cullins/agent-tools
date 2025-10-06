@@ -1,0 +1,52 @@
+# Cargo & Rust build artifacts
+/target
+**/target/
+debug/
+release/
+
+# rustc backups
+**/*.rs.bk
+
+# Coverage & profiling data
+coverage/
+**/coverage/
+*.profraw
+*.profdata
+*.gcda
+*.gcno
+
+# Binary outputs from tests or examples
+*.exe
+*.dll
+*.dylib
+*.so
+*.a
+*.lib
+*.pdb
+
+# wasm-pack / wasm tooling outputs
+pkg/
+wasm-pack.log
+
+# Node tooling (used by integration scripts/tests)
+node_modules/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Editor & IDE settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS metadata
+.DS_Store
+Thumbs.db
