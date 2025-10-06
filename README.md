@@ -1,6 +1,6 @@
 # agent_tools
 
-Two production-ready CLI tools for AI agent workflows: structure-aware code search and web content extraction.
+CLI tools for AI agent workflows: structure-aware code search and web content extraction.
 
 ## Tools
 
