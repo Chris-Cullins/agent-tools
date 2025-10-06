@@ -1,23 +1,190 @@
-# agent_tools (workspace scaffold)
+# agent_tools
 
-This is a ready-to-build Cargo workspace scaffold for two agent-first tools:
+Two production-ready CLI tools for AI agent workflows: structure-aware code search and web content extraction.
 
-- **ast-find** — structure-aware repository search (Tree-sitter powered in the real implementation)
-- **web-get** — fetch & sanitize web content into Markdown (Readability-lite in the real implementation)
+## Tools
 
-This scaffold compiles out of the box and prints NDJSON "summary" events.
-Use `docs/blueprint.md` for the full implementation plan (APIs, crates, code sketches).
+### **ast-find** — Structure-Aware Code Search
 
-## Quick start
+Tree-sitter powered code search with a simple DSL for finding calls, imports, and definitions across your codebase.
 
 ```bash
-# unzip and enter the repo root
-cargo build
-cargo run -p ast-find -- --help
-cargo run -p web-get -- --help
+# Find all axios.get/post calls
+ast-find --lang ts,js --query 'call(prop=/^(get|post)$/)' --within src/
+
+# Find all imports of a module
+ast-find --lang py --query 'import(module=/^requests$/)'
+
+# Find function definitions
+ast-find --lang js --query 'def(name=/^handle/)'
 ```
 
-## Next steps
+**Features:**
+- ✅ JavaScript, TypeScript, Python support
+- ✅ Deterministic NDJSON output
+- ✅ Parallel file processing with rayon
+- ✅ Git-aware file walking (.gitignore respected)
+- ✅ Context-aware excerpts with configurable line range
 
-- Replace the stubs with the Tree-sitter parsing and HTTP/Readability-lite extraction outlined in `docs/blueprint.md`.
-- Keep NDJSON output, determinism (UTC/NO_COLOR), and hard limits.
+### **web-get** — Web Content → Markdown
+
+Fetch web pages, extract main content, and convert to clean Markdown for LLM consumption.
+
+```bash
+# Fetch a single page
+web-get "https://example.com/article"
+
+# Batch fetch with stdin
+cat urls.txt | web-get --concurrency 8
+
+# Use CSS selector for precise extraction
+web-get "https://blog.example.com" --selector "article, .post-content"
+```
+
+**Features:**
+- ✅ Readability-lite content extraction
+- ✅ HTML sanitization with ammonia
+- ✅ Charset auto-detection
+- ✅ Configurable size/timeout limits
+- ✅ Bounded concurrency for batch fetching
+- ✅ Link extraction and canonical URL support
+
+## Installation
+
+```bash
+cargo install --path crates/ast-find
+cargo install --path crates/web-get
+```
+
+Or build both:
+
+```bash
+cargo build --release
+# Binaries in target/release/ast-find and target/release/web-get
+```
+
+## Quick Start
+
+```bash
+# Clone and build
+git clone https://github.com/Chris-Cullins/agent-tools.git
+cd agent-tools
+cargo build --release
+
+# Test ast-find
+echo 'import axios from "axios"; axios.get(url);' > test.js
+cargo run -p ast-find -- --lang js --query 'call(prop=/^get$/)' --within .
+
+# Test web-get
+cargo run -p web-get -- "https://example.com"
+```
+
+## Documentation
+
+- **[AGENTS.md](./AGENTS.md)** — Complete usage guide for AI agents
+- **[agent_tools_ast-find_web-get_blueprint.md](./agent_tools_ast-find_web-get_blueprint.md)** — Implementation blueprint and design doc
+
+## Output Format
+
+Both tools emit **NDJSON** (newline-delimited JSON) for easy parsing:
+
+**ast-find:**
+```json
+{"type":"match","lang":"javascript","path":"./src/api.js","start_line":42,"end_line":42,"chunk_id":"abc123...","score":1.0,"excerpt":"...code...","capture":{"callee":"get","object":"axios"}}
+```
+
+**web-get:**
+```json
+{"type":"document","url":"https://example.com","title":"Page Title","text_md":"# Heading\n\nContent...","word_count":523,"links":["https://..."],"hash":"blake3hex"}
+```
+
+## Query DSL (ast-find)
+
+Simple pattern matching with regex predicates:
+
+| Pattern | Example | Matches |
+|---------|---------|---------|
+| `call(callee=/regex/)` | `call(callee=/^fetch$/)` | Function calls |
+| `call(prop=/regex/)` | `call(prop=/^(get\|post)$/)` | Method calls |
+| `import(module=/regex/)` | `import(module=/^axios/)` | Import statements |
+| `def(name=/regex/)` | `def(name=/^handle/)` | Function/class definitions |
+
+## Agent Workflow Examples
+
+**Code Search + Context:**
+```bash
+ast-find --lang ts --query 'call(prop=/^deprecated/)' --max-results 50 | \
+  jq -r '.path' | sort -u > files_to_migrate.txt
+```
+
+**Documentation Retrieval:**
+```bash
+echo "https://docs.example.com/api
+https://docs.example.com/auth" | \
+  web-get --selector "article" | \
+  jq -r 'select(.type=="document") | .text_md' > combined_docs.md
+```
+
+**Dependency Audit:**
+```bash
+ast-find --lang js --query 'import(module=/^[^\\.\/]/)' --max-results 1000 | \
+  jq -r '.capture.module' | sort -u > all_dependencies.txt
+```
+
+## Architecture
+
+**Workspace Structure:**
+```
+agent_tools/
+├── Cargo.toml                 # Workspace root
+├── crates/
+│   ├── ast-find/              # Tree-sitter based code search
+│   │   ├── src/
+│   │   │   ├── dsl.rs         # Query DSL parser
+│   │   │   ├── adapter.rs     # Language adapter trait
+│   │   │   ├── languages/     # JS, TS, Python adapters
+│   │   │   ├── processor.rs   # File processing logic
+│   │   │   └── main.rs        # CLI & orchestration
+│   ├── web-get/               # Web content extraction
+│   │   ├── src/
+│   │   │   ├── fetch.rs       # HTTP with limits
+│   │   │   ├── extract.rs     # Content extraction
+│   │   │   ├── convert.rs     # HTML → Markdown
+│   │   │   └── main.rs        # Async CLI
+│   └── common/                # Shared utilities
+│       └── src/lib.rs         # NDJSON events, LineIndex, helpers
+```
+
+## Contributing
+
+See [agent_tools_ast-find_web-get_blueprint.md](./agent_tools_ast-find_web-get_blueprint.md) for:
+- Detailed implementation notes
+- Adding new languages to ast-find
+- Extending the query DSL
+- Performance optimization strategies
+
+## Roadmap
+
+**ast-find:**
+- [ ] Go, Rust, Java language adapters
+- [ ] Boolean combinators (And, Or, Not)
+- [ ] Incremental caching
+- [ ] Multi-line pattern matching
+
+**web-get:**
+- [ ] Advanced Readability scoring
+- [ ] PDF text extraction (beyond stubs)
+- [ ] Image alt-text extraction
+- [ ] Table → Markdown table conversion
+
+## License
+
+MIT
+
+## Acknowledgments
+
+Built following agent-first design principles:
+- Deterministic output (NO_COLOR, UTC, sorted results)
+- NDJSON for reliable parsing
+- Hard limits (size, timeout, max results)
+- Stable chunk IDs for content addressing
