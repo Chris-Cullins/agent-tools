@@ -172,7 +172,7 @@ See [agent_tools_ast-find_web-get_blueprint.md](./agent_tools_ast-find_web-get_b
 **ast-find:**
 - [x] Go language adapter
 - [x] Rust language adapter
-- [ ] Java language adapter
+- [x] Java language adapter
 - [ ] Boolean combinators (And, Or, Not)
 - [ ] Incremental caching
 - [ ] Multi-line pattern matching

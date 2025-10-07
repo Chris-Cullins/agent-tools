@@ -93,8 +93,9 @@ ast-find --lang py --query 'def(name=/^process_data$/)'
 | `.cs`, `.csx` | `csharp`, `cs` | C# |
 | `.rs` | `rust`, `rs` | Rust |
 | `.go` | `go`, `go` | Go |
+| `.java` | `java`, `java` | Java |
 
-Specify multiple languages: `--lang py,js,ts,cs,rs,go`
+Specify multiple languages: `--lang py,js,ts,cs,rs,go,java`
 
 ### Output Format
 

@@ -1,6 +1,7 @@
 /// Language adapters for different programming languages.
 pub mod csharp;
 pub mod go;
+pub mod java;
 pub mod javascript;
 pub mod python;
 pub mod rust;
@@ -11,6 +12,7 @@ use std::sync::Arc;
 
 pub use csharp::CSharpAdapter;
 pub use go::GoAdapter;
+pub use java::JavaAdapter;
 pub use javascript::{JavaScriptAdapter, TypeScriptAdapter};
 pub use python::PythonAdapter;
 pub use rust::RustAdapter;
@@ -24,6 +26,7 @@ pub enum LangId {
     CSharp,
     Rust,
     Go,
+    Java,
 }
 
 /// Map file extensions to language IDs.
@@ -37,6 +40,7 @@ pub static LANG_BY_EXT: phf::Map<&'static str, LangId> = phf_map! {
     "csx" => LangId::CSharp,
     "rs" => LangId::Rust,
     "go" => LangId::Go,
+    "java" => LangId::Java,
 };
 
 /// Get a language adapter by ID.
@@ -48,6 +52,7 @@ pub fn get_adapter(lang_id: LangId) -> Arc<dyn LangAdapter> {
         LangId::CSharp => Arc::new(CSharpAdapter),
         LangId::Rust => Arc::new(RustAdapter),
         LangId::Go => Arc::new(GoAdapter),
+        LangId::Java => Arc::new(JavaAdapter),
     }
 }
 
@@ -63,6 +68,7 @@ pub fn parse_lang_list(s: &str) -> Vec<LangId> {
                 "cs" | "csharp" | "c#" => Some(LangId::CSharp),
                 "rs" | "rust" => Some(LangId::Rust),
                 "go" | "golang" => Some(LangId::Go),
+                "java" => Some(LangId::Java),
                 _ => None,
             }
         })
