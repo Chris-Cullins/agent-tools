@@ -2,6 +2,7 @@
 pub mod csharp;
 pub mod javascript;
 pub mod python;
+pub mod rust;
 
 use crate::adapter::LangAdapter;
 use phf::phf_map;
@@ -10,6 +11,7 @@ use std::sync::Arc;
 pub use csharp::CSharpAdapter;
 pub use javascript::{JavaScriptAdapter, TypeScriptAdapter};
 pub use python::PythonAdapter;
+pub use rust::RustAdapter;
 
 /// Language ID enum for static dispatch.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -18,6 +20,7 @@ pub enum LangId {
     TypeScript,
     Python,
     CSharp,
+    Rust,
 }
 
 /// Map file extensions to language IDs.
@@ -29,6 +32,7 @@ pub static LANG_BY_EXT: phf::Map<&'static str, LangId> = phf_map! {
     "py" => LangId::Python,
     "cs" => LangId::CSharp,
     "csx" => LangId::CSharp,
+    "rs" => LangId::Rust,
 };
 
 /// Get a language adapter by ID.
@@ -38,6 +42,7 @@ pub fn get_adapter(lang_id: LangId) -> Arc<dyn LangAdapter> {
         LangId::TypeScript => Arc::new(TypeScriptAdapter),
         LangId::Python => Arc::new(PythonAdapter),
         LangId::CSharp => Arc::new(CSharpAdapter),
+        LangId::Rust => Arc::new(RustAdapter),
     }
 }
 
@@ -51,6 +56,7 @@ pub fn parse_lang_list(s: &str) -> Vec<LangId> {
                 "js" | "javascript" => Some(LangId::JavaScript),
                 "ts" | "typescript" => Some(LangId::TypeScript),
                 "cs" | "csharp" | "c#" => Some(LangId::CSharp),
+                "rs" | "rust" => Some(LangId::Rust),
                 _ => None,
             }
         })
