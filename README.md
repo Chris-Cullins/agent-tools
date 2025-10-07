@@ -170,7 +170,7 @@ See [agent_tools_ast-find_web-get_blueprint.md](./agent_tools_ast-find_web-get_b
 ## Roadmap
 
 **ast-find:**
-- [ ] Go language adapter
+- [x] Go language adapter
 - [x] Rust language adapter
 - [ ] Java language adapter
 - [ ] Boolean combinators (And, Or, Not)
