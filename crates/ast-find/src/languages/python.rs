@@ -60,6 +60,7 @@ impl LangAdapter for PythonAdapter {
                 let query = tree_sitter::Query::new(&lang, query_str)?;
                 Ok(vec![query])
             }
+            _ => anyhow::bail!("Composite expressions are handled in the processor"),
         }
     }
 }

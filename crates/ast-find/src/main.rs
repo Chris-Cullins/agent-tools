@@ -80,21 +80,17 @@ fn main() -> Result<()> {
     files.par_iter().for_each(|(path, lang_id)| {
         let adapter = get_adapter(*lang_id);
         match processor::process_file(adapter.as_ref(), path, &expr, context) {
-            Ok(events) => {
+            Ok(records) => {
                 let mut results = results.lock().unwrap();
-                for event in events {
+                for record in records {
                     if results.len() >= max_results {
                         return;
                     }
-                    // Key by (path, start_line) for deterministic ordering
-                    if let Event::Match {
-                        ref path,
-                        start_line,
-                        ..
-                    } = event
-                    {
-                        results.insert((path.clone(), start_line), event);
+                    let key = (record.path.clone(), record.start_line);
+                    if results.contains_key(&key) {
+                        continue;
                     }
+                    results.insert(key, record.into());
                 }
             }
             Err(e) => {

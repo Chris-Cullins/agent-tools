@@ -83,6 +83,18 @@ ast-find --lang js --query 'def(name=/^handle/)'
 ast-find --lang py --query 'def(name=/^process_data$/)'
 ```
 
+#### Boolean Combinators
+
+Combine expressions with:
+- `and(expr, ...)` — intersection of matches
+- `or(expr, ...)` — union of matches
+- `not(expr)` — complements matches relative to other operands
+
+Example:
+```bash
+ast-find --lang ts --query "and(call(prop=/log/), not(call(object=/console/)))"
+```
+
 ### Supported Languages
 
 | Extension | Language ID | Adapter |

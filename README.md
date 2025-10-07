@@ -113,6 +113,14 @@ Simple pattern matching with regex predicates:
 | `import(module=/regex/)` | `import(module=/^axios/)` | Import statements |
 | `def(name=/regex/)` | `def(name=/^handle/)` | Function/class definitions |
 
+Combine queries using boolean operators:
+
+- `and(expr, ...)` — results present in every operand
+- `or(expr, ...)` — results from any operand
+- `not(expr)` — removes operand matches from sibling expressions
+
+Example: `and(call(prop=/log/), not(call(object=/console/)))`
+
 ## Agent Workflow Examples
 
 **Code Search + Context:**
@@ -173,7 +181,7 @@ See [agent_tools_ast-find_web-get_blueprint.md](./agent_tools_ast-find_web-get_b
 - [x] Go language adapter
 - [x] Rust language adapter
 - [x] Java language adapter
-- [ ] Boolean combinators (And, Or, Not)
+- [x] Boolean combinators (And, Or, Not)
 - [ ] Incremental caching
 - [ ] Multi-line pattern matching
 
