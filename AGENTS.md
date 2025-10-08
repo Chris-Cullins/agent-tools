@@ -35,6 +35,7 @@ The DSL supports three node types with regex predicates:
 **Predicates:**
 - `callee=/regex/` — Match simple function calls by name
 - `prop=/regex/` — Match method/property calls (e.g., `obj.method()`)
+- `text=/regex/` — Match the entire call expression source (multi-line friendly; `.` matches newlines)
 
 **Examples:**
 ```bash
@@ -46,6 +47,9 @@ ast-find --lang js --query 'call(prop=/^log$/)'
 
 # Find fetch() calls
 ast-find --lang js --query 'call(callee=/^fetch$/)'
+
+# Find axios.get calls whose options mention an Authorization header
+ast-find --lang js --query 'call(text=/axios\.get\(.*Authorization/)'
 ```
 
 **Note**: For member expressions like `axios.get()`, the capture returns:
@@ -82,6 +86,8 @@ ast-find --lang js --query 'def(name=/^handle/)'
 # Find a specific function
 ast-find --lang py --query 'def(name=/^process_data$/)'
 ```
+
+> **Tip:** Every node kind supports `text=/regex/` (alias: `code=/regex/`) to match the full snippet with multi-line patterns. The `text` predicate treats `.` as matching newlines by default, so multi-line snippets just work.
 
 #### Boolean Combinators
 

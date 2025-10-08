@@ -110,8 +110,21 @@ Simple pattern matching with regex predicates:
 |---------|---------|---------|
 | `call(callee=/regex/)` | `call(callee=/^fetch$/)` | Function calls |
 | `call(prop=/regex/)` | `call(prop=/^(get\|post)$/)` | Method calls |
+| `call(text=/regex/)` | `call(text=/axios\.get\(.*Authorization/)` | Full call text (multi-line) |
 | `import(module=/regex/)` | `import(module=/^axios/)` | Import statements |
 | `def(name=/regex/)` | `def(name=/^handle/)` | Function/class definitions |
+
+Use `text=/regex/` (alias: `code=/regex/`) with any node kind to inspect the full snippet. For this predicate `.` already matches newlines, so multi-line patterns work without extra flags.
+
+### Multi-line Matching
+
+Multi-line calls, imports, or definitions often defeat plain regex searches. Combine AST matching with the `text`/`code` predicate to stay accurate without giving up span-aware matching:
+
+```bash
+ast-find --lang js --query 'call(text=/axios\\.get\\(.*Authorization/)'
+```
+
+The query above only returns `call_expression` nodes whose full source (including nested options objects) mentions an `Authorization` header anywhere inside the call. Because the `text` predicate automatically turns on dot-all mode, `.*` will cross line breaks out of the box. The alias `code=/.../` behaves identically if you prefer a more descriptive keyword.
 
 Combine queries using boolean operators:
 

@@ -4,7 +4,7 @@
 /// - call(callee=/^axios\.(get|post)$/)
 /// - import(module=/^requests$/)
 /// - def(name=/^verifyJwt$/)
-use regex::Regex;
+use regex::{Regex, RegexBuilder};
 use std::fmt;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -31,6 +31,7 @@ pub enum Pred {
     Module(Regex),
     Prop(Regex),
     Arg(Regex),
+    Text(Regex),
 }
 
 impl Pred {
@@ -41,6 +42,7 @@ impl Pred {
             Pred::Module(re) if field == "module" => re.is_match(text),
             Pred::Prop(re) if field == "prop" => re.is_match(text),
             Pred::Arg(re) if field == "arg" => re.is_match(text),
+            Pred::Text(re) if field == "text" => re.is_match(text),
             _ => false,
         }
     }
@@ -278,7 +280,7 @@ fn parse_predicates(preds_str: &str) -> anyhow::Result<Vec<Pred>> {
                 anyhow::bail!("Expected regex pattern like /.../ for {}", field);
             };
 
-            let re = Regex::new(pattern)
+            let re = build_regex(field, pattern)
                 .map_err(|e| anyhow::anyhow!("Invalid regex for {}: {}", field, e))?;
 
             let pred = match field {
@@ -287,6 +289,7 @@ fn parse_predicates(preds_str: &str) -> anyhow::Result<Vec<Pred>> {
                 "module" => Pred::Module(re),
                 "prop" => Pred::Prop(re),
                 "arg" => Pred::Arg(re),
+                "text" | "code" => Pred::Text(re),
                 _ => anyhow::bail!("Unknown predicate field: {}", field),
             };
 
@@ -297,6 +300,14 @@ fn parse_predicates(preds_str: &str) -> anyhow::Result<Vec<Pred>> {
     }
 
     Ok(preds)
+}
+
+fn build_regex(field: &str, pattern: &str) -> Result<Regex, regex::Error> {
+    let mut builder = RegexBuilder::new(pattern);
+    if matches!(field, "text" | "code") {
+        builder.dot_matches_new_line(true);
+    }
+    builder.build()
 }
 
 /// Split predicates by commas, respecting regex delimiters.
@@ -356,6 +367,16 @@ mod tests {
         let expr = parse_query("call(callee=/foo/, arg=/bar/)").unwrap();
         if let Expr::Node { preds, .. } = expr {
             assert_eq!(preds.len(), 2);
+        }
+    }
+
+    #[test]
+    fn test_parse_text_predicate() {
+        let expr = parse_query(r"call(text=/axios\.get\(.*headers/)").unwrap();
+        if let Expr::Node { preds, .. } = expr {
+            assert_eq!(preds.len(), 1);
+        } else {
+            panic!("Expected Node");
         }
     }
 

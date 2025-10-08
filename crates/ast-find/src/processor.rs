@@ -129,6 +129,9 @@ impl<'a> EvalContext<'a> {
                     bundle.insert(capture_name.to_string(), text);
                 }
 
+                // Store full node text for multi-line predicates.
+                bundle.insert("__node_text", node_text(&self.src, &node));
+
                 if !self.adapter.post_capture_filter(&bundle) {
                     continue;
                 }
@@ -267,6 +270,10 @@ fn apply_predicates(preds: &[Pred], bundle: &CaptureBundle) -> bool {
                 // TODO: Implement argument matching
                 true
             }
+            Pred::Text(re) => bundle
+                .get("__node_text")
+                .map(|t| re.is_match(t))
+                .unwrap_or(false),
         };
 
         if !matched {
@@ -280,4 +287,46 @@ fn node_text(src: &[u8], node: &Node) -> String {
     let start = node.start_byte();
     let end = node.end_byte();
     String::from_utf8_lossy(&src[start..end]).to_string()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::dsl::parse_query;
+    use crate::languages::JavaScriptAdapter;
+    use std::io::Write;
+    use tempfile::NamedTempFile;
+
+    #[test]
+    fn multi_line_text_predicate_matches() {
+        let mut temp = NamedTempFile::new().expect("create temp file");
+        write!(
+            temp,
+            r#"async function test() {{
+    const result = axios.get(
+        'https://api.example.com/data',
+        {{
+            headers: {{
+                Authorization: 'Bearer token',
+            }},
+        }},
+    );
+    return result;
+}}
+"#
+        )
+        .expect("write temp file");
+
+        let adapter = JavaScriptAdapter;
+        let sanity_expr = parse_query("call(prop=/^get$/)").expect("parse sanity query");
+        let sanity_matches = process_file(&adapter, temp.path(), &sanity_expr, 0)
+            .expect("process sanity file");
+        assert_eq!(sanity_matches.len(), 1);
+
+        let expr = parse_query(r"call(text=/axios\.get\(.*Authorization/)")
+            .expect("parse query");
+        let matches = process_file(&adapter, temp.path(), &expr, 0)
+            .expect("process file");
+        assert_eq!(matches.len(), 1);
+    }
 }
