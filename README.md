@@ -143,6 +143,35 @@ ast-find --lang js --query 'import(module=/^[^\\.\/]/)' --max-results 1000 | \
 - [ ] Image alt-text extraction
 - [ ] Table → Markdown table conversion
 
+## Possible Future Tool Ideas
+
+**git-diff-json** — Structured diffs and hunks  
+Emit per-file changes and per-hunk spans between commits/branches/working tree. Avoids fragile parsing of patch text; directly yields file-level and hunk-level structures with stable IDs and spans.
+
+**repo-ls** — Repo-aware file inventory  
+Walk repo honoring .gitignore and emit files with metadata: size, lang, hash, line counts. Single pass, deterministic, with language detection and content hashes for deduplication.
+
+**dep-scan** — Dependency manifest normalizer  
+Parse manifests and lockfiles (package.json, Cargo.toml, pyproject.toml, etc.) into a unified dependency list. Cross-ecosystem, structured graph with resolved versions and sources.
+
+**doc-index** — Markdown/MDX indexer and link graph  
+Parse .md/.mdx to extract headings, anchors, links, and per-section spans. Structured table of contents and document graph; per-section chunking with stable IDs.
+
+**link-check** — Concurrent HTTP link validator  
+Verify internal/external links with redirects, status, canonical, content-type. Handles concurrency, timeouts, and outputs structured results.
+
+**api-probe** — JSON API sampler and shape extractor  
+Perform HEAD/GET/POST with sample payloads and emit structured response metadata plus inferred JSON shape (keys/types). Quickly map REST endpoint response shapes.
+
+**code-chop** — Deterministic chunker for code/text  
+Split files into stable, size-bounded chunks for embedding/context with language-aware boundaries. Stable chunk IDs and boundaries; reproducible spans.
+
+**secret-find** — Deterministic secrets scanner  
+Scan repo for likely secrets using curated detectors with entropy and context windows. Structured findings with types and confidence; consistent ignores and sorting.
+
+**task-list** — Discover runnable project tasks  
+Enumerate build/test tasks from Makefile, package.json scripts, Cargo.toml workspace, and common CI configs. Normalizes disparate task definitions into a single structured list.
+
 ## License
 
 MIT
